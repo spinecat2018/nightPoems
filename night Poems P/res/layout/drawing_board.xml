@@ -2,15 +2,31 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/space"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical" >
 	
-    <com.example.nightpoemsp.DrawingBoard 
-        android:id="@+id/new_board"
-	    android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+   
+    
+    
+    <Button
+        android:id="@+id/btn_clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        
+        android:text="clear"
+       />
+    
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        
+        android:text="save"
+         />
+    
+    
     
 
 </LinearLayout>

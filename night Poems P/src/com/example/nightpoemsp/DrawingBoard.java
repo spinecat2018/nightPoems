@@ -1,3 +1,4 @@
+//自定义控件  涂鸦板
 package com.example.nightpoemsp;
 
 import android.content.Context;
@@ -5,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff.Mode;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -87,6 +89,7 @@ public class DrawingBoard extends SurfaceView implements SurfaceHolder.Callback,
            
         }finally {
            if (mCanvas != null){
+        	   
                mSurfaceHolder.unlockCanvasAndPost(mCanvas);
            }
         }
@@ -96,6 +99,8 @@ public class DrawingBoard extends SurfaceView implements SurfaceHolder.Callback,
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
+        
+       
         
         switch ( event.getAction() ) {
             case MotionEvent.ACTION_DOWN:
@@ -123,5 +128,41 @@ public class DrawingBoard extends SurfaceView implements SurfaceHolder.Callback,
         }
         return true;
     }
+    
+    public boolean reDraw() {
+    	
+    	Canvas canvas = null;
+    	
+    	
+    	
+        try{
+
+            canvas = mSurfaceHolder.lockCanvas(null);
+            //canvas.drawColor(Color.WHITE);
+            //canvas.drawColor(Color.TRANSPARENT, Mode.SRC);
+            mCanvas.drawColor(Color.BLACK);
+
+        }catch(Exception e){
+
+
+        }finally{
+
+            if(canvas != null){
+
+            	mSurfaceHolder.unlockCanvasAndPost(canvas);
+               
+                isDrawing = false;
+
+            }
+        }
+
+    		
+
+    	
+    	
+    	return true;
+    		
+    }
+    
     
 }
