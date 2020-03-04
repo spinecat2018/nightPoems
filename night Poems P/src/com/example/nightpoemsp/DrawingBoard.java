@@ -2,6 +2,7 @@
 package com.example.nightpoemsp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -129,40 +130,19 @@ public class DrawingBoard extends SurfaceView implements SurfaceHolder.Callback,
         return true;
     }
     
-    public boolean reDraw() {
-    	
-    	Canvas canvas = null;
-    	
-    	
-    	
-        try{
-
-            canvas = mSurfaceHolder.lockCanvas(null);
-            //canvas.drawColor(Color.WHITE);
-            //canvas.drawColor(Color.TRANSPARENT, Mode.SRC);
-            mCanvas.drawColor(Color.BLACK);
-
-        }catch(Exception e){
-
-
-        }finally{
-
-            if(canvas != null){
-
-            	mSurfaceHolder.unlockCanvasAndPost(canvas);
-               
-                isDrawing = false;
-
-            }
-        }
-
-    		
-
-    	
-    	
-    	return true;
-    		
+    private void drawIt(Canvas canvas) {
+        canvas.drawColor(Color.BLACK);
+        canvas.drawPath(mPath, mPaint);
     }
+    
+    
+    public Bitmap getBitmap() {
+        Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawIt(canvas);
+        return bitmap;
+    }
+    
     
     
 }
