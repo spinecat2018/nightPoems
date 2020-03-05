@@ -4,25 +4,35 @@ package com.example.nightpoemsp;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import android.Manifest;
 import android.Manifest.permission;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -31,6 +41,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -55,87 +67,105 @@ public class Draw extends Activity  implements OnClickListener{
 //	private int whichColor = 0;          /** Called when the activity is first created. */    
 	private int id = 0;
 	
+	private float mLastX, mLastY;
+	
+	//private float y1;
+	
+	boolean moved=false;
+	int waitTime=1500;
+	
+	
+	
+	CountDownTimer timer = new CountDownTimer(waitTime, waitTime){//共x毫秒，每y毫秒
+        @Override
+        public void onTick(long sin) {
+        	
+            //Toast.makeText(Draw.this, "" + sin/1000, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onFinish() {
+           //Toast.makeText(Draw.this, "倒计时完成", Toast.LENGTH_SHORT).show();
+           save();
+           clear();
+           
+        }
+    };
+	
+	
+	
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.drawing_board);
+     
         
-        Log.d("night","create board");
+        //Log.d("night","create board");
         
         //board=(DrawingBoard) findViewById(R.id.new_board);
         
         
-        cleanButton = (Button) findViewById(R.id.btn_clear);
-        cleanButton.setOnClickListener(this);
+       // cleanButton = (Button) findViewById(R.id.btn_clear);
+       // cleanButton.setOnClickListener(this);
         
-        saveButton = (Button) findViewById(R.id.btn_save);
-        saveButton.setOnClickListener(this);
+      //  saveButton = (Button) findViewById(R.id.btn_save);
+      //  saveButton.setOnClickListener(this);
          
         XmlPullParser parser = Draw.this.getResources().getXml(R.layout.drawing_board);
 		AttributeSet attributes = Xml.asAttributeSet(parser);
     	
     	board= new DrawingBoard(getBaseContext(),attributes);
     	board.setId(id);
-    	Log.d("night","id++="+id);
+    	Log.d("night","id="+id);
     	((ViewGroup) findViewById(R.id.space)).addView( board  );
         
-        
+    	
+
+    	
 		
 	}
-        
+    
 	@Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_clear:
-            	Log.d("night","clear");
-            	((ViewGroup) findViewById(R.id.space)).removeView((DrawingBoard) findViewById(id));
-            	
-            	XmlPullParser parser = Draw.this.getResources().getXml(R.layout.drawing_board);
-				AttributeSet attributes = Xml.asAttributeSet(parser);
-            	
-            	board= new DrawingBoard(getBaseContext(),attributes);
-            	
-            	id=id+1;
-            	
-            	board.setId(id);
-            	
-            	Log.d("night","id++="+id);
-            	
-            	((ViewGroup) findViewById(R.id.space)).addView( board  );
-            	
-                break;
-            case R.id.btn_save:
-            	Log.d("night","to save");
-            	
-            	
-            	
-            	
-            	//ActivityCompat.requestPermissions(Draw.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL);
-            	
-            	save();
-            	
-               // if (ContextCompat.checkSelfPermission(SurfaceViewActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    //没有授权，则申请授权
-                    //ActivityCompat.requestPermissions() 参数一：context 参数二：申请的权限名数组 参数三：请求码，要求唯一值
-                    //ActivityCompat.requestPermissions(SurfaceViewActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL);
-                //} else {
+    public void onWindowFocusChanged(boolean hasFocus) {
+        // TODO Auto-generated method stub
+        super.onWindowFocusChanged(hasFocus);
+        try {
 
-            			
-            	
-            	
-            	
-               // }
-               break;
+            Object service = getSystemService("statusbar");
+            Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
+            Method test = statusbarManager.getMethod("collapse");
+            test.invoke(service);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 	
 	
+	@Override
+    public void onClick(View view) {
+		/*    switch (view.getId()) {
+            case R.id.btn_clear:
+            	//Log.d("night","clear");
+            	
+            	clear();
+            	
+                break;
+            case R.id.btn_save:
+            	//Log.d("night","to save");
+            	           	
+            	save();
+            	
+               break;
+        }
+        */
+    }
+    
+	
+	
 	private void save() {
-		/*        View dView = getWindow().getDecorView();
-		        dView.setDrawingCacheEnabled(true);
-		        dView.buildDrawingCache();*/
+
 		        Bitmap bitmap = board.getBitmap();
 		        
 		        Date date = new Date(System.currentTimeMillis());
@@ -148,23 +178,44 @@ public class Draw extends Activity  implements OnClickListener{
 		                File folder = new File(dir, "night poems");
 		                folder.mkdir();//创建文件夹
 
-		                Log.d("night","get dir:"+folder.toString());
+		                //Log.d("night","get dir:"+folder.toString());
 		                // 图片文件路径
 		                File file = new File(folder,getSecondTimeStamp(date)+ ".png");
-		                Log.d("night","make file");
+		                //Log.d("night","make file");
 		                FileOutputStream os = new FileOutputStream(file);
-		                Log.d("night","make os");
+		                //Log.d("night","make os");
 		                bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
-		                Log.d("night","compress pic");
+		                //Log.d("night","compress pic");
 		                os.flush();
 		                os.close();
-		                Log.d("night","save");
-		                Toast.makeText(this, "存储到："+folder.toString(), Toast.LENGTH_SHORT).show();
+		               // Log.d("night","save");
+		                //Toast.makeText(this, "存储到："+folder.toString(), Toast.LENGTH_SHORT).show();
 		            } catch (Exception e) {
 		             
 		            }
 		        }
 		    }
+	
+	private void clear() {
+		
+		((ViewGroup) findViewById(R.id.space)).removeView((DrawingBoard) findViewById(id));
+    	
+    	XmlPullParser parser = Draw.this.getResources().getXml(R.layout.drawing_board);
+		AttributeSet attributes = Xml.asAttributeSet(parser);
+    	
+    	board= new DrawingBoard(getBaseContext(),attributes);
+    	
+    	id=id+1;
+    	
+    	board.setId(id);
+    	
+    	Log.d("night","id="+id);
+    	
+    	((ViewGroup) findViewById(R.id.space)).addView( board  );
+		
+		
+	}
+	
 	
 	public static String getSecondTimeStamp(Date date){
         if (null == date) {
@@ -175,8 +226,68 @@ public class Draw extends Activity  implements OnClickListener{
     }
 	
 	
+	   
+	@Override
+    public boolean onTouchEvent(MotionEvent event) {
+		
+		//y1 = board.getTop();
+    	//Log.d("night","to top"+y1);
+		
+        float x = event.getX();
+        //float y = event.getY()-192-50;
+        float y = event.getY()-50;//50 可能是顶部标题栏
+
         
-	
+        
+       
+        
+        switch ( event.getAction() ) {
+            case MotionEvent.ACTION_DOWN:
+            	//每次开始将标记设置为ture
+                board.isDrawing = true ;
+                //开启线程
+                new Thread(board).start();
+                mLastX = x;
+                mLastY = y;
+                board.mPath.moveTo(mLastX, mLastY);
+                timer.cancel();
+                break;
+            case MotionEvent.ACTION_MOVE:
+            	moved=true;
+            	timer.cancel();
+            	//偏移量
+                float dx = Math.abs(x - mLastX);
+                float dy = Math.abs(y - mLastY);
+                if (dx >= 3 || dy >= 3) {
+                    board.mPath.quadTo(mLastX, mLastY, (mLastX + x) / 2, (mLastY + y) / 2);
+                }
+                mLastX = x;
+                mLastY = y;
+                
+                break;
+            case MotionEvent.ACTION_UP:
+                board.isDrawing = false;
+                
+              //倒计时CountDownTimer
+              //每过1000毫秒执行一次onTick
+              //倒计时完成执行onFinish
+
+              if(moved){
+            	  moved=false;
+            	  timer.start();
+              }
+               
+              //timer.start();
+              
+                
+              
+                
+                
+                
+                break;
+        }
+        return true;
+    }
 	
 	
         

@@ -23,7 +23,7 @@ public class MainActivity  extends Activity implements OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         
-        buttonStart = (Button) findViewById(R.id.button_start);
+       // buttonStart = (Button) findViewById(R.id.button_start);
         buttonShow = (Button) findViewById(R.id.button_show);
         
         Log.d("night","create");
@@ -39,12 +39,12 @@ public class MainActivity  extends Activity implements OnClickListener {
     @Override
     public void onClick(View v) {
     switch (v.getId()) {
-    case R.id.button_start:
-    	buttonStart.setVisibility(View.GONE);
-    	buttonShow.setVisibility(View.GONE);
+    //case R.id.button_start:
+    //	buttonStart.setVisibility(View.GONE);
+    //	buttonShow.setVisibility(View.GONE);
     	
-    	Log.d("night","click");
-    	break;
+    //	Log.d("night","click");
+    //	break;
     case R.id.button_show:
     	Intent intent = new Intent(MainActivity.this, Draw.class);
     	startActivity(intent);

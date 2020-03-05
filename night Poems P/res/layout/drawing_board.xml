@@ -9,22 +9,23 @@
 	
    
     
-    
+    <!--  
     <Button
-        android:id="@+id/btn_clear"
+        android:id="@+id/cancelBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         
-        android:text="clear"
+        android:text="cancelBtn"
        />
     
     <Button
-        android:id="@+id/btn_save"
+        android:id="@+id/btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         
-        android:text="save"
+        android:text="btn"
          />
+	-->    
     
     
     

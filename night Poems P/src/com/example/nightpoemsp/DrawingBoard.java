@@ -8,10 +8,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 public class DrawingBoard extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     // SurfaceHolder
@@ -19,13 +22,16 @@ public class DrawingBoard extends SurfaceView implements SurfaceHolder.Callback,
     // 画布
     private Canvas mCanvas;
     // 子线程标志位
-    private boolean isDrawing;
+    public boolean isDrawing;
     // 画笔
     Paint mPaint;
     // 路径
     Path mPath;
     //上次的坐标
-    private float mLastX, mLastY;
+    //private float mLastX, mLastY;
+    
+    
+    
 
     
     public DrawingBoard(Context context, AttributeSet attrs) {
@@ -96,39 +102,7 @@ public class DrawingBoard extends SurfaceView implements SurfaceHolder.Callback,
         }
     }
     
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        
-       
-        
-        switch ( event.getAction() ) {
-            case MotionEvent.ACTION_DOWN:
-            	//每次开始将标记设置为ture
-                isDrawing = true ;
-                //开启线程
-                new Thread(this).start();
-                mLastX = x;
-                mLastY = y;
-                mPath.moveTo(mLastX, mLastY);
-                break;
-            case MotionEvent.ACTION_MOVE:
-            	//偏移量
-                float dx = Math.abs(x - mLastX);
-                float dy = Math.abs(y - mLastY);
-                if (dx >= 3 || dy >= 3) {
-                    mPath.quadTo(mLastX, mLastY, (mLastX + x) / 2, (mLastY + y) / 2);
-                }
-                mLastX = x;
-                mLastY = y;
-                break;
-            case MotionEvent.ACTION_UP:
-                isDrawing = false;
-                break;
-        }
-        return true;
-    }
+    
     
     private void drawIt(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
