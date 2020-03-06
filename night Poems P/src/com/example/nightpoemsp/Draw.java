@@ -14,6 +14,8 @@ import org.xmlpull.v1.XmlPullParser;
 import android.Manifest;
 import android.Manifest.permission;
 import android.app.Activity;
+import android.app.Service;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -21,16 +23,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -72,7 +79,7 @@ public class Draw extends Activity  implements OnClickListener{
 	//private float y1;
 	
 	boolean moved=false;
-	int waitTime=1500;
+	int waitTime=1000;
 	
 	
 	
@@ -88,6 +95,11 @@ public class Draw extends Activity  implements OnClickListener{
            //Toast.makeText(Draw.this, "倒计时完成", Toast.LENGTH_SHORT).show();
            save();
            clear();
+           
+           vibrate(Draw.this, 30);
+           
+          
+           Log.d("night","vib");
            
         }
     };
@@ -122,7 +134,85 @@ public class Draw extends Activity  implements OnClickListener{
     	((ViewGroup) findViewById(R.id.space)).addView( board  );
         
     	
+    	
+    	
+    	
+    	
+    	
+    	getWindow().getDecorView().setSystemUiVisibility(View.INVISIBLE);
+    	
+    	   	
+    
+    	//mBtn.setFocusable(true);
+    	//mBtn.setFocusableInTouchMode(true);
+    	//mBtn.requestFocus();
 
+    	
+    	/*
+    	board.setOnFocusChangeListener(new android.view.View.OnFocusChangeListener() {  
+
+    	    @Override  
+
+    	    public void onFocusChange(View v, boolean hasFocus) {  
+
+    	        if(hasFocus) {
+
+    	// 此处为得到焦点时的处理内容
+
+    	} else {
+
+    	// 此处为失去焦点时的处理内容
+    		getWindow().getDecorView().setSystemUiVisibility(View.INVISIBLE);
+    		
+    		board.setFocusable(true);
+    		board.setFocusableInTouchMode(true);
+    		board.requestFocus();
+
+    	}
+
+    	    }
+
+    	});
+    	*/
+    	
+
+    	
+    	//更改屏幕亮度控制方式为手动
+    	ContentResolver contentResolver = this.getContentResolver();
+
+        try {
+
+            int mode = Settings.System.getInt(contentResolver,
+
+                    Settings.System.SCREEN_BRIGHTNESS_MODE);
+
+            if (mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,
+
+                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+
+            }
+
+        } catch (Settings.SettingNotFoundException e) {
+
+            e.printStackTrace();
+        }
+     
+    	
+        Log.d("night","亮度为"+getScreenBrightness(this));
+        
+        
+        //setWindowBrightness(30);
+        
+        setScreenBrightness(1);
+
+        
+        Log.d("night","亮度改为"+getScreenBrightness(this));
+    	
+    	
+    	
+    	
     	
 		
 	}
@@ -213,7 +303,7 @@ public class Draw extends Activity  implements OnClickListener{
     	
     	((ViewGroup) findViewById(R.id.space)).addView( board  );
 		
-		
+    	Log.d("night","亮度"+getScreenBrightness(this));
 	}
 	
 	
@@ -235,7 +325,7 @@ public class Draw extends Activity  implements OnClickListener{
 		
         float x = event.getX();
         //float y = event.getY()-192-50;
-        float y = event.getY()-50;//50 可能是顶部标题栏
+        float y = event.getY();//50 可能是顶部标题栏
 
         
         
@@ -243,6 +333,11 @@ public class Draw extends Activity  implements OnClickListener{
         
         switch ( event.getAction() ) {
             case MotionEvent.ACTION_DOWN:
+            	//if(getWindow().getDecorView().getSystemUiVisibility()==View.SYSTEM_UI_FLAG_VISIBLE){
+                    
+              //	  getWindow().getDecorView().setSystemUiVisibility(View.INVISIBLE);
+                
+              //  } 
             	//每次开始将标记设置为ture
                 board.isDrawing = true ;
                 //开启线程
@@ -276,7 +371,12 @@ public class Draw extends Activity  implements OnClickListener{
             	  moved=false;
             	  timer.start();
               }
-               
+              
+            //  if(getWindow().getDecorView().getSystemUiVisibility()==View.SYSTEM_UI_FLAG_VISIBLE){
+            //  
+            //	  getWindow().getDecorView().setSystemUiVisibility(View.INVISIBLE);
+              
+             // } 
               //timer.start();
               
                 
@@ -290,7 +390,52 @@ public class Draw extends Activity  implements OnClickListener{
     }
 	
 	
-        
+	
+	//震动milliseconds毫秒
+	public static void vibrate(final Activity activity, long milliseconds) {
+	        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+	        vib.vibrate(milliseconds);
+	    }
+	//以pattern[]方式震动
+	public static void vibrate(final Activity activity, long[] pattern,int repeat){
+	        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+	        vib.vibrate(pattern,repeat);
+	    }
+	//取消震动
+	public static void virateCancle(final Activity activity){
+	        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+	        vib.cancel();
+	    }
+	
+	
+	
+	private int getScreenBrightness(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        int defVal = 125;
+        return Settings.System.getInt(contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS, defVal);
+    }
+    
+	private void setWindowBrightness(int brightness) {
+	    Window window = getWindow();
+	    WindowManager.LayoutParams lp = window.getAttributes();
+	    lp.screenBrightness = brightness / 255.0f;
+	    window.setAttributes(lp);
+	}
+	
+	public void setScreenBrightness(int paramInt){
+	    try {
+	        Settings.System.putInt(getApplicationContext().getContentResolver(),
+	                Settings.System.SCREEN_BRIGHTNESS, paramInt);
+	        Uri mUri = Settings.System.getUriFor("screen_brightness");
+	        getApplicationContext().getContentResolver().notifyChange(mUri, null);
+	    }catch (Exception e){
+	        Log.e("Brightness", e.toString());
+	    }
+	}
+
+	
+	
         
 }
 	
