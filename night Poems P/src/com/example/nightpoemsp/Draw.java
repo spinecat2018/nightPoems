@@ -435,7 +435,26 @@ public class Draw extends Activity  implements OnClickListener{
 	}
 
 	
+	@Override
+	protected void onPause() {
+	super.onPause();
 	
+	vibrate(Draw.this, 80);
+	
+	new Handler().postDelayed(new Runnable() {
+	    public void run() {
+	    	vibrate(Draw.this, 30);
+	    }
+	}, 100);
+	
+	new Handler().postDelayed(new Runnable() {
+	    public void run() {
+	    	vibrate(Draw.this, 80);
+	    }
+	}, 100);
+	
+	
+	}
         
 }
 	
